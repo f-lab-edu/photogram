@@ -21,6 +21,13 @@ services:
       - "6379:6379"
     command: redis-server --save 60 1 --loglevel warning
 
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+
   discovery-service:
     build: ./discovery-service
     container_name: discovery-service
@@ -61,6 +68,16 @@ services:
     build: ./post-service
     container_name: post-service
     restart: always
+    depends_on:
+      - discovery-service
+      - config-service
+
+  feed-service:
+    build: ./feed-service
+    container_name: feed-service
+    restart: always
+    ports:
+      - "8080:8080"
     depends_on:
       - discovery-service
       - config-service

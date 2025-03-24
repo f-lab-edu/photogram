@@ -9,6 +9,7 @@ import com.setung.error.InvalidPasswordException
 import com.setung.error.NotFoundException
 import com.setung.file.FileClient
 import com.setung.mail.EmailClient
+import com.setung.producer.UserEventProducer
 import com.setung.repo.FollowRepository
 import com.setung.repo.ProfileImageRepository
 import com.setung.repo.UserRepository
@@ -26,7 +27,8 @@ class UserService(
     val jwtProvider: JwtProvider,
     val fileClient: FileClient,
     val profileImageRepository: ProfileImageRepository,
-    private val followRepository: FollowRepository
+    private val followRepository: FollowRepository,
+    private val userEventPublisher: UserEventProducer
 ) {
 
     fun signup(request: UserSignupRequest): Long {
@@ -77,6 +79,7 @@ class UserService(
     fun delete(id: Long, request: UserDeleteRequest) {
         val user = findById(id)
         emailCodeService.verifyEmailCode(user.email, request.code, EmailCodeType.ACCOUNT_DELETE)
+        userEventPublisher.sendUserDeleteEvent(user.id!!, getFollowers(id, FollowStatus.ACCEPTED))
 
         user.delete()
 
@@ -122,4 +125,7 @@ class UserService(
             user.deleteProfileImage()
         }
     }
+
+    fun getFollowers(userId: Long, status: FollowStatus): List<Long> = followRepository.findFollowersByUserId(userId, status)
+
 }

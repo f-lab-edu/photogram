@@ -9,4 +9,5 @@ VALUES
     (7, 'follow_test', 'follow_public_tester@test.com', false, '$2a$10$6ipZUZWDYEVXa0jwgF/L2efyVMnzYs8r/s4eSoQ.gI9qFSICRDn5O', 'NORMAL', sysdate(), sysdate()),
     (8, 'follow_test', 'follow_private_tester@test.com', true, '$2a$10$6ipZUZWDYEVXa0jwgF/L2efyVMnzYs8r/s4eSoQ.gI9qFSICRDn5O', 'NORMAL', sysdate(), sysdate()),
     (9, 'profile-image', 'profile-image_tester@test.com', true, '$2a$10$6ipZUZWDYEVXa0jwgF/L2efyVMnzYs8r/s4eSoQ.gI9qFSICRDn5O', 'NORMAL', sysdate(), sysdate()),
-    (10, 'name', 'find-private@test.com', true, '$2a$10$6ipZUZWDYEVXa0jwgF/L2efyVMnzYs8r/s4eSoQ.gI9qFSICRDn5O', 'NORMAL', sysdate(), sysdate());
+    (10, 'name', 'find-private@test.com', true, '$2a$10$6ipZUZWDYEVXa0jwgF/L2efyVMnzYs8r/s4eSoQ.gI9qFSICRDn5O', 'NORMAL', sysdate(), sysdate()),
+    (11, 'followers', 'find-followers@test.com', false, '$2a$10$6ipZUZWDYEVXa0jwgF/L2efyVMnzYs8r/s4eSoQ.gI9qFSICRDn5O', 'NORMAL', sysdate(), sysdate());

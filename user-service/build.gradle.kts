@@ -38,6 +38,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation(project(":auth-library"))
     implementation(project(":common-library"))
+    implementation("org.springframework.kafka:spring-kafka")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("org.testcontainers:kafka")
 
     runtimeOnly("com.mysql:mysql-connector-j")
 

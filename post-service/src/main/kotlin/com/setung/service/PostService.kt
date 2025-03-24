@@ -11,6 +11,7 @@ import com.setung.entity.TagEntity
 import com.setung.error.ForbiddenException
 import com.setung.error.NotFoundException
 import com.setung.file.FileClient
+import com.setung.producer.PostEventProducer
 import com.setung.repo.PostRepository
 import com.setung.repo.TagRepository
 import org.springframework.stereotype.Service
@@ -22,7 +23,8 @@ class PostService(
     private val postRepository: PostRepository,
     private val fileClient: FileClient,
     private val tagRepository: TagRepository,
-    private val userClient: UserClient
+    private val userClient: UserClient,
+    private val postEventProducer: PostEventProducer
 ) {
 
     @Transactional
@@ -32,7 +34,11 @@ class PostService(
             tagRepository.findByName(it) ?: tagRepository.save(TagEntity.of(it))
         }
 
-        return postRepository.save(PostEntity.of(loginUserId, request, fileUrls, tags)).id!!
+        val post = postRepository.save(PostEntity.of(loginUserId, request, fileUrls, tags))
+
+        postEventProducer.sendPostUploadEvent(post)
+
+        return post.id!!
     }
 
     fun findById(postId: Long) =
@@ -47,6 +53,8 @@ class PostService(
 
         post.delete()
         postRepository.save(post)
+
+        postEventProducer.sendPostDeleteEvent(post)
     }
 
     @Transactional
@@ -90,4 +98,11 @@ class PostService(
 
         return emptyList()
     }
+
+    fun findAllIdsByWriterId(writerId: Long, pageSize: Int): List<Long> {
+        return postRepository.findAllIdsByWriterId(writerId, pageSize)
+    }
+
+    fun findAllByIds(postIds: List<Long>) = postRepository.findAllByIds(postIds).map { PostDetails.ofPublic(it) }
+
 }

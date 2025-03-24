@@ -3,6 +3,7 @@ package com.setung.service
 import com.setung.config.TestContainerConfig
 import com.setung.entity.FollowStatus
 import com.setung.error.*
+import com.setung.repo.FollowRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -15,7 +16,8 @@ import org.springframework.context.annotation.Import
 @SpringBootTest
 @Import(TestContainerConfig::class)
 class FollowServiceTest @Autowired constructor(
-    private val followService: FollowService
+    private val followService: FollowService,
+    private val followRepository: FollowRepository
 ) {
 
     @Nested
@@ -109,6 +111,21 @@ class FollowServiceTest @Autowired constructor(
         @DisplayName("팔로우 삭제 실패 테스트 - 다른 사용자의 팔로우")
         fun deleteFollowFailureTestWithOthers() {
             assertThrows<ForbiddenException> { followService.deleteFollow(1, 5) }
+        }
+    }
+
+    @Nested
+    inner class FindFollowerIds {
+
+        @Test
+        fun test() {
+            val acceptedFollowers = followRepository.findFollowersByUserId(11, FollowStatus.ACCEPTED)
+            val pendingFollowers = followRepository.findFollowersByUserId(11, FollowStatus.PENDING)
+            val rejectedFollowers = followRepository.findFollowersByUserId(11, FollowStatus.REJECTED)
+
+            assertThat(acceptedFollowers).contains(1L)
+            assertThat(pendingFollowers).isEmpty()
+            assertThat(rejectedFollowers).isEmpty()
         }
     }
 }

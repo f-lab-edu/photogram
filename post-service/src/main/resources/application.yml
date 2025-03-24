@@ -24,3 +24,8 @@ spring:
     table: post_schema_history
     baseline-on-migrate: true
     baseline-version: 0
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.apache.kafka.common.serialization.StringDeserializer

@@ -3,6 +3,7 @@ package com.setung.service
 import com.setung.entity.FollowEntity
 import com.setung.entity.FollowStatus
 import com.setung.error.*
+import com.setung.producer.UserEventProducer
 import com.setung.repo.FollowRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service
 @Service
 class FollowService(
     private val followRepository: FollowRepository,
-    private val userService: UserService
+    private val userService: UserService,
+    private val userEventPublisher: UserEventProducer
 ) {
 
     fun follow(requesterId: Long, targetId: Long): Long {
@@ -22,7 +24,12 @@ class FollowService(
         val status = if (target.isPrivate) FollowStatus.PENDING else FollowStatus.ACCEPTED
 
         return try {
-            followRepository.save(FollowEntity(requester = requester, target = target, status = status)).id!!
+            val follow = followRepository.save(FollowEntity(requester = requester, target = target, status = status))
+
+            if (follow.status == FollowStatus.ACCEPTED)
+                userEventPublisher.sendUserFollowEvent(requesterId, targetId)
+
+            follow.id!!
         } catch (ex: DataIntegrityViolationException) {
             throw DuplicationException("Follow already exists.")
         }
@@ -40,6 +47,7 @@ class FollowService(
             throw BadRequestException("Could not accept follow ${follow.status} status")
 
         follow.accept()
+        userEventPublisher.sendUserFollowEvent(follow.requester.id!!, follow.target.id!!)
 
         followRepository.save(follow)
     }
@@ -53,6 +61,7 @@ class FollowService(
             throw BadRequestException("Could not reject follow ${follow.status} status")
 
         follow.reject()
+        userEventPublisher.sendUserUnfollowEvent(follow.requester.id!!, follow.target.id!!)
 
         followRepository.save(follow)
     }
@@ -62,6 +71,8 @@ class FollowService(
 
         if (follow.requester.id != loginUserId)
             throw ForbiddenException("Could not delete other's follow")
+
+        userEventPublisher.sendUserUnfollowEvent(follow.requester.id!!, follow.target.id!!)
 
         followRepository.delete(follow)
     }

@@ -1,0 +1,42 @@
+spring:
+  cloud:
+    config:
+      enabled: true
+      uri: http://localhost:8888
+      name: feed-service
+      profile: default
+  config:
+    activate:
+      on-profile: default
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    enabled: true
+  instance:
+    instance-id: ${spring.application.name}-${random.value}
+    prefer-ip-address: true
+
+---
+spring:
+  cloud:
+    config:
+      enabled: true
+      uri: http://config-service:8888
+      name: feed-service
+      profile: native
+  config:
+    activate:
+      on-profile: native
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka
+    enabled: true
+  instance:
+    instance-id: ${spring.application.name}-${random.value}
+    prefer-ip-address: true

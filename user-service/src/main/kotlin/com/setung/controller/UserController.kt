@@ -2,6 +2,7 @@ package com.setung.controller
 
 import com.setung.auth.annotation.LoginUser
 import com.setung.dto.*
+import com.setung.entity.FollowStatus
 import com.setung.service.UserService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -55,4 +56,7 @@ class UserController(
     fun deleteProfileImage(@LoginUser userId: Long) =
         ResponseEntity(userService.deleteProfileImage(userId), HttpStatus.OK)
 
+    @GetMapping("/{userId}/followers")
+    fun getFollowers(@PathVariable userId: Long, @RequestParam followStatus: FollowStatus = FollowStatus.ACCEPTED) =
+        ResponseEntity(userService.getFollowers(userId, followStatus), HttpStatus.OK)
 }

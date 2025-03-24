@@ -1,7 +1,7 @@
 spring:
   cloud:
     config:
-      enabled: false
+      enabled: true
       uri: http://localhost:8888
       name: post-service
       profile: default
@@ -14,7 +14,7 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
-    enabled: false
+    enabled: true
   instance:
     instance-id: ${spring.application.name}-${random.value}
     prefer-ip-address: true

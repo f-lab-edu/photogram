@@ -24,6 +24,8 @@ spring:
   flyway:
     enabled: true
     table: user_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
 
 jwt:
   enabled: true
